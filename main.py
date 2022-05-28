@@ -2,6 +2,7 @@ from cgitb import text
 from textwrap import fill
 import tkinter as tk
 from tkinter import ttk
+import pymysql
 from tkinter import font
 from turtle import width
 from xml.dom.minidom import ReadOnlySequentialNamedNodeMap
@@ -21,60 +22,91 @@ detail_frame.place(x=20,y=150,width=450,height=550)
 data_frame = tk.Frame(win,bd=12,bg = "black", relief = tk.GROOVE)
 data_frame.place(x=475,y=90,width=1050,height=680)
 
+"""Variables"""
+
+exp_no = tk.StringVar()
+batch = tk.StringVar()
+rollno = tk.StringVar()
+dose = tk.StringVar()
+docoe = tk.StringVar()
+edoec = tk.StringVar()
+doec = tk.StringVar()
+marks = tk.StringVar()
+
+search_by = tk.StringVar()
+
+"""DONE"""
+
 """Entry"""
 
 expno_lb1 = tk.Label(detail_frame,text="Exp No",font=("Arial",17), bg = "yellow",)
 expno_lb1.grid(row=0,column=0,padx=2,pady=2)
 
-expno_ent1 = tk.Entry(detail_frame,bd=7,font=("Arial",17))
+expno_ent1 = tk.Entry(detail_frame,bd=7,font=("Arial",17),textvariable=exp_no)
 expno_ent1.grid(row=0,column=1,padx=2,pady=2)
 
 
 batch_lb2 = tk.Label(detail_frame,text="Batch",font=("Arial",17), bg = "yellow",)
 batch_lb2.grid(row=1,column=0,padx=2,pady=2)
 
-batch_ent2 = tk.Entry(detail_frame,bd=7,font=("Arial",17))
+batch_ent2 = tk.Entry(detail_frame,bd=7,font=("Arial",17),textvariable=batch)
 batch_ent2.grid(row=1,column=1,padx=2,pady=2)
 
 rollno_lb1 = tk.Label(detail_frame,text="Roll No",font=("Arial",17), bg = "yellow",)
 rollno_lb1.grid(row=2,column=0,padx=2,pady=2)
 
-rollno_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17))
+rollno_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17),textvariable=rollno)
 rollno_ent.grid(row=2,column=1,padx=2,pady=2)
 
-doec_lb1 = tk.Label(detail_frame,text="Date of Starting Exp",font=("Arial",17), bg = "yellow",)
-doec_lb1.grid(row=3,column=0,padx=2,pady=2)
+dose_lb1 = tk.Label(detail_frame,text="Date of Starting Exp",font=("Arial",17), bg = "yellow",)
+dose_lb1.grid(row=3,column=0,padx=2,pady=2)
 
-doec_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17))
-doec_ent.grid(row=3,column=1,padx=2,pady=2)
+dose_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17),textvariable=dose)
+dose_ent.grid(row=3,column=1,padx=2,pady=2)
 
 doef_lb1 = tk.Label(detail_frame,text="Date of Completion of Exp",font=("Arial",17), bg = "yellow",)
 doef_lb1.grid(row=4,column=0,padx=2,pady=2)
 
-doef_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17))
-doef_ent.grid(row=4,column=1,padx=2,pady=2)
+docoe_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17),textvariable=docoe)
+docoe_ent.grid(row=4,column=1,padx=2,pady=2)
 
-edoef_lb1 = tk.Label(detail_frame,text="Expected Date of Exp Checking",font=("Arial",17), bg = "yellow",)
-edoef_lb1.grid(row=5,column=0,padx=2,pady=2)
+edoec_lb1 = tk.Label(detail_frame,text="Expected Date of Exp Checking",font=("Arial",17), bg = "yellow",)
+edoec_lb1.grid(row=5,column=0,padx=2,pady=2)
 
-edoef_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17))
-edoef_ent.grid(row=5,column=1,padx=2,pady=2)
+edoec_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17),textvariable=edoec)
+edoec_ent.grid(row=5,column=1,padx=2,pady=2)
 
-doed_lb1 = tk.Label(detail_frame,text="Date of Exp Checked",font=("Arial",17), bg = "yellow",)
-doed_lb1.grid(row=6,column=0,padx=2,pady=2)
+doec_lb1 = tk.Label(detail_frame,text="Date of Exp Checked",font=("Arial",17), bg = "yellow",)
+doec_lb1.grid(row=6,column=0,padx=2,pady=2)
 
-doed_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17))
-doed_ent.grid(row=6,column=1,padx=2,pady=2)
+doec_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17),textvariable=doec)
+doec_ent.grid(row=6,column=1,padx=2,pady=2)
 
-doed_lb1 = tk.Label(detail_frame,text="Marks",font=("Arial",17), bg = "yellow",)
-doed_lb1.grid(row=7,column=0,padx=2,pady=2)
+marks_lb1 = tk.Label(detail_frame,text="Marks",font=("Arial",17), bg = "yellow",)
+marks_lb1.grid(row=7,column=0,padx=2,pady=2)
 
-doed_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17))
-doed_ent.grid(row=7,column=1,padx=2,pady=2)
+marks_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17),textvariable=marks)
+marks_ent.grid(row=7,column=1,padx=2,pady=2)
 
 
 
 """********"""
+
+"""FUNCTIONS"""
+
+def fetch_date():
+    conn = pymysql.connect(host="Localhost",user="root",password="",database="labregister")
+    curr = conn.cursor()
+    curr.execute("SELECT * FROM lab_details")
+    rows = curr.fetchall()
+    if len(rows)!=0:
+        student_table.delete(*student_table.get_children())
+        for row in rows:
+            student_table.insert("",tk.END,values=row)
+        conn.commit()
+    conn.close()    
+
+"""DONE"""
 
 """BUTTON"""
 
@@ -105,7 +137,7 @@ search_frame.pack(side=tk.TOP,fill=tk.X)
 search_lb1 = tk.Label(search_frame,text="Search",fg="yellow",bg="black",font=("Arial",14))
 search_lb1.grid(row=0, column=0, padx=12, pady=2)
 
-search_in = ttk.Combobox(search_frame,font=('Arial,14'),state="readonly")
+search_in = ttk.Combobox(search_frame,font=('Arial,14'),state="readonly",textvariable=search_by)
 search_in['values'] = ("Name","Roll No","Batch","Exp No")
 search_in.grid(row=0,column=1,padx=12,pady=2)
 
@@ -150,6 +182,9 @@ student_table['show'] = 'headings'
 
 
 student_table.pack(fill=tk.BOTH,expand=True)
+
+fetch_date()
+
 
 
 
