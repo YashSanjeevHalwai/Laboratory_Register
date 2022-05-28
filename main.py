@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import font
 from turtle import width
+from xml.dom.minidom import ReadOnlySequentialNamedNodeMap
 
 win = tk.Tk()
 win.geometry('1350x200')
@@ -94,17 +95,64 @@ clear_btn.grid(row=1,column=1,padx=2,pady=2)
 
 """DONE BUTTON"""
 
+
+
+"""SEARCH"""
+
 search_frame = tk.Frame(data_frame,bg="black",bd=10,relief=tk.GROOVE)
 search_frame.pack(side=tk.TOP,fill=tk.X)
 
 search_lb1 = tk.Label(search_frame,text="Search",fg="yellow",bg="black",font=("Arial",14))
-search_lb1.grid(row=0, column=0, padx=2, pady=2)
+search_lb1.grid(row=0, column=0, padx=12, pady=2)
 
-"""SEARCH"""
+search_in = ttk.Combobox(search_frame,font=('Arial,14'),state="readonly")
+search_in['values'] = ("Name","Roll No","Batch","Exp No")
+search_in.grid(row=0,column=1,padx=12,pady=2)
 
+search_btn = tk.Button(search_frame, text="Search",font=("Arial",13),bd=9,width=14,bg="black",fg="yellow")
+search_btn.grid(row=0,column=2,padx=12,pady=2)
 
+search_btn = tk.Button(search_frame, text="Show All",font=("Arial",13),bd=9,width=14,bg="black",fg="yellow")
+search_btn.grid(row=0,column=3,padx=12,pady=2)
 
 """Search Done"""
+
+main_frame = tk.Frame(data_frame,bg="lightgrey",bd=3,relief=tk.GROOVE)
+main_frame.pack(fill=tk.BOTH,expand=True)
+
+y_scroll = tk.Scrollbar(main_frame,orient=tk.VERTICAL)
+x_scroll = tk.Scrollbar(main_frame,orient=tk.HORIZONTAL)
+
+"""Exp No, Batch, Roll No, Date of Starting Exp, Date of Completion of Exp, Expected Date of Exp Checking, Date of Exp Checked, Marks"""
+
+student_table = ttk.Treeview(main_frame,columns=("Batch","Roll No", "Date of Starting Exp", "Date of Completion of Exp", "Expected Date of Exp Checking", "Date of Exp Checked", "Marks"),yscrollcommand=y_scroll.set,xscrollcommand=x_scroll.set)
+
+y_scroll.config(command=student_table.yview)
+x_scroll.config(command=student_table.xview)
+
+y_scroll.pack(side=tk.RIGHT,fill=tk.Y)
+x_scroll.pack(side=tk.BOTTOM,fill=tk.X)
+
+student_table.pack(fill=tk.BOTH,expand=True)
+
+"""Exp No, Batch, Roll No, Date of Starting Exp, Date of Completion of Exp, Expected Date of Exp Checking, Date of Exp Checked, Marks"""
+
+student_table.heading("Batch", text="Batch")
+student_table.heading("Roll No", text="Roll No")
+student_table.heading("Date of Starting Exp", text="Date of Starting Exp")
+student_table.heading("Date of Completion of Exp", text="Date of Completion of Exp")
+student_table.heading("Expected Date of Exp Checking", text="Expected Date of Exp Checking")
+student_table.heading("Date of Exp Checked", text="Date of Exp Checked")
+student_table.heading("Marks", text="Marks")
+
+student_table['show'] = 'headings'
+
+
+
+student_table.pack(fill=tk.BOTH,expand=True)
+
+
+
 
 win.mainloop()
 
