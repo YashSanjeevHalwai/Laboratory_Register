@@ -1,7 +1,9 @@
 from cgitb import text
+from dataclasses import fields
 from textwrap import fill
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 import pymysql
 from tkinter import font
 from turtle import width
@@ -94,7 +96,7 @@ marks_ent.grid(row=7,column=1,padx=2,pady=2)
 
 """FUNCTIONS"""
 
-def fetch_date():
+def fetch_data():
     conn = pymysql.connect(host="Localhost",user="root",password="",database="labregister")
     curr = conn.cursor()
     curr.execute("SELECT * FROM lab_details")
@@ -106,6 +108,18 @@ def fetch_date():
         conn.commit()
     conn.close()    
 
+def add_function():
+    if exp_no.get() == "" or batch.get() == "" or rollno.get() == "" or dose.get() == "" or docoe.get() == "" or edoec.get() == "" or doec.get() == ""or marks.get() == "":
+        messagebox.showerror("Error!", "Please fill all the fields!")
+    else:
+        conn = pymysql.connect(host="Localhost",user="root",password="",database="labregister")
+        curr = conn.cursor()
+        curr.execute("INSERT INTO lab_details VALUES(%s,%s,%s,%s,%s,%s,%s,%s)",(exp_no.get(),batch.get(),rollno.get(),dose.get(),docoe.get(),edoec.get(),doec.get(),marks.get()))
+        conn.commit() 
+        conn.close()  
+
+        fetch_data()
+
 """DONE"""
 
 """BUTTON"""
@@ -113,7 +127,7 @@ def fetch_date():
 btn_frame = tk.Frame(detail_frame,bg="yellow",bd="10",relief=tk.GROOVE)
 btn_frame.place(x=50,y=400,width=370,height=110)
 
-add_btn = tk.Button(btn_frame,bg="black",fg="yellow",text="Add",bd=7,font=("Arial",12),width=17)
+add_btn = tk.Button(btn_frame,bg="black",fg="yellow",text="Add",bd=7,font=("Arial",12),width=17,command=add_function)
 add_btn.grid(row=0,column=0,padx=2,pady=2)
 
 update_btn = tk.Button(btn_frame,bg="black",fg="yellow",text="Update",bd=7,font=("Arial",12),width=16)
@@ -157,7 +171,7 @@ x_scroll = tk.Scrollbar(main_frame,orient=tk.HORIZONTAL)
 
 """Exp No, Batch, Roll No, Date of Starting Exp, Date of Completion of Exp, Expected Date of Exp Checking, Date of Exp Checked, Marks"""
 
-student_table = ttk.Treeview(main_frame,columns=("Batch","Roll No", "Date of Starting Exp", "Date of Completion of Exp", "Expected Date of Exp Checking", "Date of Exp Checked", "Marks"),yscrollcommand=y_scroll.set,xscrollcommand=x_scroll.set)
+student_table = ttk.Treeview(main_frame,columns=("Exp No","Batch","Roll No", "Date of Starting Exp", "Date of Completion of Exp", "Expected Date of Exp Checking", "Date of Exp Checked", "Marks"),yscrollcommand=y_scroll.set,xscrollcommand=x_scroll.set)
 
 y_scroll.config(command=student_table.yview)
 x_scroll.config(command=student_table.xview)
@@ -169,6 +183,7 @@ student_table.pack(fill=tk.BOTH,expand=True)
 
 """Exp No, Batch, Roll No, Date of Starting Exp, Date of Completion of Exp, Expected Date of Exp Checking, Date of Exp Checked, Marks"""
 
+student_table.heading("Exp No", text="Exp No")
 student_table.heading("Batch", text="Batch")
 student_table.heading("Roll No", text="Roll No")
 student_table.heading("Date of Starting Exp", text="Date of Starting Exp")
@@ -183,7 +198,7 @@ student_table['show'] = 'headings'
 
 student_table.pack(fill=tk.BOTH,expand=True)
 
-fetch_date()
+fetch_data()
 
 
 
