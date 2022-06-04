@@ -1,3 +1,4 @@
+from tkinter import *
 from cgitb import text
 from dataclasses import fields
 from textwrap import fill
@@ -7,7 +8,7 @@ from tkinter import messagebox
 import pymysql
 from tkinter import font
 from turtle import width
-from xml.dom.minidom import ReadOnlySequentialNamedNodeMap
+
 
 win = tk.Tk()
 win.geometry('1350x200')
@@ -90,8 +91,6 @@ marks_lb1.grid(row=7,column=0,padx=2,pady=2)
 marks_ent = tk.Entry(detail_frame,bd=7,font=("Arial",17),textvariable=marks)
 marks_ent.grid(row=7,column=1,padx=2,pady=2)
 
-
-
 """********"""
 
 """FUNCTIONS"""
@@ -120,6 +119,52 @@ def add_function():
 
         fetch_data()
 
+def get_cursor(event):
+    """This function will fetch data of the selected row"""
+    cursor_row = student_table.focus()
+    content = student_table.item(cursor_row)
+    row = content['values']
+
+    exp_no.set(row[0])
+    batch.set(row[1])
+    rollno.set(row[2])
+    dose.set(row[3])
+    docoe.set(row[4])
+    edoec.set(row[5])
+    doec.set(row[6])
+    marks.set(row[7])
+
+def clear():
+    """This is function which will clear the entry boxes"""
+    exp_no.set("")
+    batch.set("")
+    rollno.set("")
+    dose.set("")
+    docoe.set("")
+    edoec.set("")
+    doec.set("")
+    marks.set("")
+
+def update_fun():
+    """This function will update data according to user"""
+    conn = pymysql.connect(host="Localhost",user="root",password="",database="labregister")
+    curr = conn.cursor()
+    curr.execute("update lab_details set exp_no=%s,batch=%s,dose=%s,docoe=%s,edoec=%s,doec=%s,marks=%s where rollno=%s",(exp_no.get(),batch.get(),dose.get(),docoe.get(),edoec.get(),doec.get(),marks.get(),rollno.get()))
+    conn.commit()
+    conn.close()
+    fetch_data()
+    clear()
+
+def delete_fun():
+    "This function will delete data from database"
+    conn = pymysql.connect(host="Localhost",user="root",password="",database="labregister")
+    curr = conn.cursor()  
+    curr.execute("delete from lab_details where rollno=%s",rollno.get())
+    conn.commit()
+    conn.close()
+    fetch_data()
+    clear()
+
 """DONE"""
 
 """BUTTON"""
@@ -130,13 +175,13 @@ btn_frame.place(x=50,y=400,width=370,height=110)
 add_btn = tk.Button(btn_frame,bg="black",fg="yellow",text="Add",bd=7,font=("Arial",12),width=17,command=add_function)
 add_btn.grid(row=0,column=0,padx=2,pady=2)
 
-update_btn = tk.Button(btn_frame,bg="black",fg="yellow",text="Update",bd=7,font=("Arial",12),width=16)
+update_btn = tk.Button(btn_frame,bg="black",fg="yellow",text="Update",bd=7,font=("Arial",12),width=16,command=update_fun)
 update_btn.grid(row=0,column=1,padx=2,pady=2)
 
-delete_btn = tk.Button(btn_frame,bg="black",fg="yellow",text="Delete",bd=7,font=("Arial",11),width=17)
+delete_btn = tk.Button(btn_frame,bg="black",fg="yellow",text="Delete",bd=7,font=("Arial",11),width=17,command=delete_fun)
 delete_btn.grid(row=1,column=0,padx=2,pady=2)
 
-clear_btn = tk.Button(btn_frame,bg="black",fg="yellow",text="Clear",bd=7,font=("Arial",11),width=16)
+clear_btn = tk.Button(btn_frame,bg="black",fg="yellow",text="Clear",bd=7,font=("Arial",11),width=16,command=clear)
 clear_btn.grid(row=1,column=1,padx=2,pady=2)
 
 """DONE BUTTON"""
@@ -200,9 +245,7 @@ student_table.pack(fill=tk.BOTH,expand=True)
 
 fetch_data()
 
-
-
-
+student_table.bind("<ButtonRelease-1>",get_cursor)
 
 win.mainloop()
 
